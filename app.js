@@ -7,7 +7,11 @@ const app = express();
 app.use(express.json());
 
 app.use(cors());
-
+app.get("/", (req, res) => {
+  res.json({
+    hello: "world",
+  });
+});
 app.get("/api/relay/:deviceId/on", async (req, res) => {
   const client = new DigestClient(process.env.USER, process.env.PASSWORD, {
     algorithm: "MD5",
