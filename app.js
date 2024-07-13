@@ -5,7 +5,7 @@ import cors from "cors";
 
 const app = express();
 app.use(express.json());
-
+const port = process.env.PORT || 4242;
 app.use(cors());
 app.get("/", (req, res) => {
   res.json({
@@ -50,6 +50,6 @@ app.get("/api/relay/:deviceId/off", async (req, res) => {
   res.send(result);
 });
 
-app.listen(4242, () => {
+app.listen(port, () => {
   console.log("Server running on port 4242");
 });
