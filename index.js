@@ -2,10 +2,16 @@ import express from "express";
 import "dotenv/config";
 import DigestClient from "digest-fetch";
 import cors from "cors";
+import xml2js from "xml2js";
 
+const parser = new xml2js.Parser();
+let xmlData;
 const app = express();
 app.use(express.json());
 const port = process.env.PORT || 4242;
+const user = process.env.HIKUSER;
+const password = process.env.HIKPASSWORD;
+const url = process.env.HIKURL;
 
 app.use(cors());
 app.get("/", (req, res) => {
@@ -14,11 +20,11 @@ app.get("/", (req, res) => {
   });
 });
 app.get("/api/relay/:deviceId/on", async (req, res) => {
-  const client = new DigestClient(process.env.USER, process.env.PASSWORD, {
+  const client = new DigestClient(user, password, {
     algorithm: "MD5",
   });
   const on = await client.fetch(
-    `${process.env.URL}/ISAPI/AccessControl/RemoteControl/door/${req.params.deviceId}`,
+    `${url}/ISAPI/AccessControl/RemoteControl/door/${req.params.deviceId}`,
     {
       method: "PUT",
       headers: {
@@ -29,15 +35,18 @@ app.get("/api/relay/:deviceId/on", async (req, res) => {
     }
   );
   const result = await on.text();
-  res.send(result);
+  parser.parseString(result, (err, res) => (xmlData = res));
+  if (xmlData) {
+    res.json({ isOpen: true, relayID: req.params.deviceId, ...xmlData });
+  }
 });
 
 app.get("/api/relay/:deviceId/off", async (req, res) => {
-  const client = new DigestClient(process.env.USER, process.env.PASSWORD, {
+  const client = new DigestClient(user, password, {
     algorithm: "MD5",
   });
   const on = await client.fetch(
-    `${process.env.URL}/ISAPI/AccessControl/RemoteControl/door/${req.params.deviceId}`,
+    `${url}/ISAPI/AccessControl/RemoteControl/door/${req.params.deviceId}`,
     {
       method: "PUT",
       headers: {
