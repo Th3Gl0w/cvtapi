@@ -57,7 +57,29 @@ app.get("/api/relay/:deviceId/off", async (req, res) => {
     }
   );
   const result = await on.text();
-  res.send(result);
+  parser.parseString(result, (err, res) => (xmlData = res));
+  if (xmlData) {
+    res.json({ isOpen: true, relayID: req.params.deviceId, ...xmlData });
+  }
+});
+app.get("/api/relay/:deviceId/status", async (req, res) => {
+  const client = new DigestClient(user, password, {
+    algorithm: "MD5",
+  });
+  const on = await client.fetch(
+    `${url}/ISAPI/AccessControl/Door/param/${req.params.deviceId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/xml; charset=UTF-8",
+      },
+    }
+  );
+  const result = await on.text();
+  parser.parseString(result, (err, res) => (xmlData = res));
+  if (xmlData) {
+    res.json({ relayID: req.params.deviceId, ...xmlData });
+  }
 });
 
 app.listen(port, () => {
