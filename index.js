@@ -59,7 +59,7 @@ app.get("/api/relay/:deviceId/off", async (req, res) => {
   const result = await on.text();
   parser.parseString(result, (err, res) => (xmlData = res));
   if (xmlData) {
-    res.json({ isOpen: true, relayID: req.params.deviceId, ...xmlData });
+    res.json({ isOpen: false, relayID: req.params.deviceId, ...xmlData });
   }
 });
 app.get("/api/relay/:deviceId/status", async (req, res) => {
